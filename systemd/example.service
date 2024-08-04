@@ -1,0 +1,11 @@
+[Unit]
+Description=example app
+Requires=vault-credential-server.socket
+
+[Service]
+Type=oneshot
+LoadCredential=foo:/run/vault-credentials.socket
+ExecStart=/bin/bash -c 'echo "foo=$(cat ${CREDENTIALS_DIRECTORY}/foo)"'
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=full

@@ -1,0 +1,15 @@
+[Unit]
+Description=example app
+# Makes sure that vault-agent@example.service is started first
+After=vault-agent@%i.service
+# Similar to requires, but also makes sure that when this service stops, 
+# vault-agent@example.service
+# also stops (see man systemd.unit) for more info
+BindsTo=vault-agent@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'sleep 5; echo -n "secret is "; cat /run/example/secret'
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=full

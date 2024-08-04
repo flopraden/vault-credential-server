@@ -1,0 +1,31 @@
+[Unit]
+Description=vault agent for %i
+Requires=vault-credential-service.socket
+# This service will only be started by the %i.service, this
+# makes this service automatically stop when %i.service is stopped
+StopWhenUnneeded=yes
+
+[Service]
+# run the vault agent as the same user and group as the app
+User=%i
+Group=%i
+# Get role-id and secret-id from the credentials server
+LoadCredential=role-id:/run/vault-credentials.socket
+LoadCredential=secret-id:/run/vault-credentials.socket
+EnvironmentFile=/etc/vault-server/env
+ExecStart=/bin/sh -c "cd ${CREDENTIALS_DIRECTORY}; exec /usr/bin/vault agent -config /etc/%i/vault-agent.hcl"
+ExecReload=kill -HUP $MAINPID
+# Let systemd configure the configuration directory, ie in /etc
+ConfigurationDirectory=%i
+# let systemd set up the runtime directory, ie in /run
+RuntimeDirectory=%i
+RuntimeDirectoryMode=0750
+NoNewPrivileges=yes
+ProtectSystem=full
+ProtectHome=read-only
+PrivateTmp=yes
+LimitMEMLOCK=infinity
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+AmbientCapabilities=CAP_IPC_LOCK
+Restart=always
+RestartSec=5
